@@ -1,7 +1,0 @@
-D:\diplom\Planarnost\Planarnost\bin\Debug\Planarnost.exe.config
-D:\diplom\Planarnost\Planarnost\bin\Debug\Planarnost.exe
-D:\diplom\Planarnost\Planarnost\bin\Debug\Planarnost.pdb
-D:\diplom\Planarnost\Planarnost\obj\Debug\PlanarnostUI.csproj.CoreCompileInputs.cache
-D:\diplom\Planarnost\Planarnost\obj\Debug\Planarnost.exe
-D:\diplom\Planarnost\Planarnost\obj\Debug\Planarnost.pdb
-D:\diplom\Planarnost\Planarnost\obj\Debug\PlanarnostUI.csprojAssemblyReference.cache
