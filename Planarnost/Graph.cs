@@ -106,8 +106,9 @@ namespace PlanarCheck
             int countOfRowaWithThreeUnits = 0;
             foreach (int i in indexes)
             {
+                List<int> contrictedIndexes = new List<int>();
                 foreach (int j in indexes)
-                    if (matrix[i, j] == 1)
+                    if (matrix[i, j] == 1 || CanConstrict(indexes, i, j, contrictedIndexes))
                         numberOfUnitsInRow++;
 
                 if (numberOfUnitsInRow == 3)
@@ -125,7 +126,7 @@ namespace PlanarCheck
         private bool CheckOnK33AllSubGrphs()
         {
             foreach (int[] indexes in Combinations.Make(6, matrix.GetLength(0)))
-                if (CheckOnK5(indexes))
+                if (CheckOnK33(indexes))
                     return true;
 
             return false;
