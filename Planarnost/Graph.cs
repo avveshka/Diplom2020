@@ -130,15 +130,68 @@ namespace PlanarCheck
             return false;
         }
 
-        //public void FindUnnecessaryEdge(List<int[]> noPlanarGrpahIndexes, out int i, out int j)
-        //{
+        public Dictionary<int[], int[,]> MakeMinimalCoverTable(List<int[]> noPlanarGrpahIndexes)
+        {
+            Dictionary<int[], int[,]> resultTable = new Dictionary<int[], int[,]>();
+            int constrictCounter = 0;
+            List<int> contrictedIndexesInRow = new List<int>();
 
-        //}
+            foreach (int[] indexes in noPlanarGrpahIndexes)
+            {
+                resultTable.Add(indexes, new int[7, 7]);
+            }
 
-        //public void ConvertToPlanar(int i, int j)
-        //{
+            foreach (int[] noPlanarGraphs in resultTable.Keys)
+            {
+                foreach (int[] indexes in Combinations.Make(2, matrix.GetLength(0)))
+                {
+                    if (noPlanarGraphs.Contains(indexes[0]) && noPlanarGraphs.Contains(indexes[1]))
+                    {
+                        if (matrix[indexes[0], indexes[1]] != 0)
+                        {
+                            resultTable[noPlanarGraphs][indexes[0], indexes[1]] = resultTable[noPlanarGraphs][indexes[1], indexes[0]] = 1;
+                        }
+                        else if(CanContrict(noPlanarGraphs, indexes[0], indexes[1], contrictedIndexesInRow))
+                        {
+                            resultTable[noPlanarGraphs][indexes[0], contrictedIndexesInRow[constrictCounter]] = resultTable[noPlanarGraphs][contrictedIndexesInRow[constrictCounter], indexes[0]] =  1;
+                            resultTable[noPlanarGraphs][indexes[1], contrictedIndexesInRow[constrictCounter]] = resultTable[noPlanarGraphs][contrictedIndexesInRow[constrictCounter], indexes[1]] = 1;
+                            constrictCounter++;
+                        }
+                    }
+                }
 
-        //}
+                constrictCounter = 0;
+                contrictedIndexesInRow = new List<int>();
+            }
+
+            return resultTable;
+        }
+
+        public void ShowMinimalCoverTable(Dictionary<int[], int[,]> table)
+        {
+            Console.Write($"indexes");
+            foreach (int[] indexes in Combinations.Make(2, matrix.GetLength(0)))
+            {
+                Console.Write($" x{indexes[0]},x{indexes[1]} ");
+            }
+            Console.WriteLine();
+
+            foreach (int[] indexes in table.Keys)
+            {
+                foreach (var item in indexes)
+                {
+                    Console.Write(item);
+                }
+
+                Console.Write($" ");
+
+                foreach (int[] indexes1 in Combinations.Make(2, matrix.GetLength(0)))
+                {
+                    Console.Write($"   {table[indexes][indexes1[0], indexes1[1]]}   ");
+                }
+                Console.WriteLine();
+            }
+        }
 
         public override string ToString()
         {

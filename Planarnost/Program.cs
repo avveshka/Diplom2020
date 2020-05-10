@@ -28,6 +28,7 @@ namespace PlanarCheck
             else
             {
                 Console.WriteLine("Не планарный");
+                test.ShowMinimalCoverTable(test.MakeMinimalCoverTable(noPlanarGrpahIndexes));
             }
         }
     }
