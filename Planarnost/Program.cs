@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace PlanarCheck
 {
@@ -19,10 +20,15 @@ namespace PlanarCheck
             });
             Console.WriteLine(test);
 
-            if (test.CheckPlanar())
+            List<int[]> noPlanarGrpahIndexes = new List<int[]>();
+            if (test.CheckPlanar(noPlanarGrpahIndexes))
+            {
                 Console.WriteLine("Планарный");
+            }
             else
+            {
                 Console.WriteLine("Не планарный");
+            }
         }
     }
 }

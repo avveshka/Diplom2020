@@ -60,90 +60,68 @@ namespace PlanarCheck
                     matrix[j, i] = matrix[i, j];
         }
 
-        public bool CheckPlanar()
+        public bool CheckPlanar(List<int[]> noPlanarGrpahIndexes)
         {
-            return !(CheckOnK5AllSubGrphs() || CheckOnK33AllSubGrphs());
+            return !(CheckOnGomeomorpfGraphAllSubGrphs(4, 5, noPlanarGrpahIndexes) | CheckOnGomeomorpfGraphAllSubGrphs(3, 6, noPlanarGrpahIndexes));
         }
 
-        private bool CheckOnK5(int[] indexes)
+        private bool CheckOnGomeomorpfGraph(int[] indexes, int expectedUnitsInRow, int expectedCountOfRows)
         {
             int numberOfUnitsInRow = 0;
-            int countOfRowWithFourUnits = 0;
+            int countOfRowWithUnits = 0;
+            //List<int> contrictedIndexesInAllMatrix = new List<int>();
             
-            foreach(int i in indexes)
+            foreach (int i in indexes)
             {
-                List<int> contrictedIndexes = new List<int>();
+                List<int> contrictedIndexesInRow = new List<int>();
                 foreach (int j in indexes)
                 {
-                    if (matrix[i, j] == 1 || CanConstrict(indexes, i, j, contrictedIndexes))
+                    if (matrix[i, j] == 1 || CanContrict(indexes, i, j/*, contrictedIndexesInAllMatrix*/, contrictedIndexesInRow))
                         numberOfUnitsInRow++;
                 }
 
-                if (numberOfUnitsInRow == 4)
-                    countOfRowWithFourUnits++;
+                if (numberOfUnitsInRow >= expectedUnitsInRow)
+                {
+                    countOfRowWithUnits++;
+                    //contrictedIndexesInAllMatrix.AddRange(contrictedIndexesInRow);
+                }
 
                 numberOfUnitsInRow = 0;
             }
 
-            if (countOfRowWithFourUnits == 5)
+            if (countOfRowWithUnits == expectedCountOfRows)
                 return true;
 
             return false;
         }
 
-        private bool CheckOnK5AllSubGrphs()
+        private bool CheckOnGomeomorpfGraphAllSubGrphs(int countUnitsInRow, int coutRows, List<int[]> noPlanarGrpahIndexes)
         {
-            foreach (int[] indexes in Combinations.Make(5, matrix.GetLength(0)))
-                if (CheckOnK5(indexes))
-                    return true;
-
-            return false;
-        }
-
-        private bool CheckOnK33(int[] indexes)
-        {
-            int numberOfUnitsInRow = 0;
-            int countOfRowaWithThreeUnits = 0;
-            foreach (int i in indexes)
+            bool isPlanar = false;
+            foreach (int[] indexes in Combinations.Make(coutRows, matrix.GetLength(0)))
             {
-                List<int> contrictedIndexes = new List<int>();
-                foreach (int j in indexes)
-                    if (matrix[i, j] == 1 || CanConstrict(indexes, i, j, contrictedIndexes))
-                        numberOfUnitsInRow++;
-
-                if (numberOfUnitsInRow == 3)
-                    countOfRowaWithThreeUnits++;
-
-                numberOfUnitsInRow = 0;
+                if (CheckOnGomeomorpfGraph(indexes, countUnitsInRow, coutRows))
+                {
+                    isPlanar = true;
+                    noPlanarGrpahIndexes.Add((int[])indexes.Clone()) ;
+                }
             }
 
-            if (countOfRowaWithThreeUnits == 6)
-                return true;
-
-            return false;
+            return isPlanar;
         }
 
-        private bool CheckOnK33AllSubGrphs()
-        {
-            foreach (int[] indexes in Combinations.Make(6, matrix.GetLength(0)))
-                if (CheckOnK33(indexes))
-                    return true;
-
-            return false;
-        }
-
-        private bool CanConstrict(int[] indexes, int i, int j, List<int> constrictedIndexes)
+        private bool CanContrict(int[] indexes, int i, int j,/* List<int> constrictedIndexesInAllMatrix,*/ List<int> constrictedIndexesInRow)
         {
             if (i == j)
                 return false;
 
             for (int counter = 0; counter < matrix.GetLength(0); counter++)
             {
-                if(!indexes.Contains(counter) && !constrictedIndexes.Contains(counter))
+                if(!indexes.Contains(counter) /*&& !constrictedIndexesInAllMatrix.Contains(counter)*/ && !constrictedIndexesInRow.Contains(counter))
                 {
                     if (matrix[counter, i] == 1 && matrix[counter, j] == 1)
                     {
-                        constrictedIndexes.Add(counter);
+                        constrictedIndexesInRow.Add(counter);
                         return true;
                     }
                 }
@@ -151,6 +129,16 @@ namespace PlanarCheck
 
             return false;
         }
+
+        //public void FindUnnecessaryEdge(List<int[]> noPlanarGrpahIndexes, out int i, out int j)
+        //{
+
+        //}
+
+        //public void ConvertToPlanar(int i, int j)
+        //{
+
+        //}
 
         public override string ToString()
         {
