@@ -55,6 +55,12 @@ namespace PlanarCheck
                     matrix[rnd.Next(0, matrix.GetLength(1)), matrix.GetLength(1)] = 1;
             }
 
+            Random rnd2 = new Random();
+            for (int i = 0; i < matrix.GetLength(0); i++)
+                for (int j = i + 1; j < matrix.GetLength(1); j++)
+                    if (matrix[i, j] == 1)
+                        matrix[i, j] = rnd2.Next(1, 100);
+
             for (int i = 0; i < matrix.GetLength(0); i++)
                 for (int j = 0; j < matrix.GetLength(1); j++)
                     matrix[j, i] = matrix[i, j];
@@ -70,13 +76,13 @@ namespace PlanarCheck
             int numberOfUnitsInRow = 0;
             int countOfRowWithUnits = 0;
             //List<int> contrictedIndexesInAllMatrix = new List<int>();
-            
+
             foreach (int i in indexes)
             {
                 List<int> contrictedIndexesInRow = new List<int>();
                 foreach (int j in indexes)
                 {
-                    if (matrix[i, j] == 1 || CanContrict(indexes, i, j/*, contrictedIndexesInAllMatrix*/, contrictedIndexesInRow))
+                    if (matrix[i, j] > 0 || CanContrict(indexes, i, j/*, contrictedIndexesInAllMatrix*/, contrictedIndexesInRow))
                         numberOfUnitsInRow++;
                 }
 
@@ -103,7 +109,7 @@ namespace PlanarCheck
                 if (CheckOnGomeomorpfGraph(indexes, countUnitsInRow, coutRows))
                 {
                     isPlanar = true;
-                    noPlanarGrpahIndexes.Add((int[])indexes.Clone()) ;
+                    noPlanarGrpahIndexes.Add((int[])indexes.Clone());
                 }
             }
 
@@ -117,9 +123,9 @@ namespace PlanarCheck
 
             for (int counter = 0; counter < matrix.GetLength(0); counter++)
             {
-                if(!indexes.Contains(counter) /*&& !constrictedIndexesInAllMatrix.Contains(counter)*/ && !constrictedIndexesInRow.Contains(counter))
+                if (!indexes.Contains(counter) /*&& !constrictedIndexesInAllMatrix.Contains(counter)*/ && !constrictedIndexesInRow.Contains(counter))
                 {
-                    if (matrix[counter, i] == 1 && matrix[counter, j] == 1)
+                    if (matrix[counter, i] > 0 && matrix[counter, j] > 0)
                     {
                         constrictedIndexesInRow.Add(counter);
                         return true;
@@ -147,13 +153,13 @@ namespace PlanarCheck
                 {
                     if (noPlanarGraphs.Contains(indexes[0]) && noPlanarGraphs.Contains(indexes[1]))
                     {
-                        if (matrix[indexes[0], indexes[1]] != 0)
+                        if (matrix[indexes[0], indexes[1]] > 0)
                         {
                             resultTable[noPlanarGraphs][indexes[0], indexes[1]] = resultTable[noPlanarGraphs][indexes[1], indexes[0]] = 1;
                         }
-                        else if(CanContrict(noPlanarGraphs, indexes[0], indexes[1], contrictedIndexesInRow))
+                        else if (CanContrict(noPlanarGraphs, indexes[0], indexes[1], contrictedIndexesInRow))
                         {
-                            resultTable[noPlanarGraphs][indexes[0], contrictedIndexesInRow[constrictCounter]] = resultTable[noPlanarGraphs][contrictedIndexesInRow[constrictCounter], indexes[0]] =  1;
+                            resultTable[noPlanarGraphs][indexes[0], contrictedIndexesInRow[constrictCounter]] = resultTable[noPlanarGraphs][contrictedIndexesInRow[constrictCounter], indexes[0]] = 1;
                             resultTable[noPlanarGraphs][indexes[1], contrictedIndexesInRow[constrictCounter]] = resultTable[noPlanarGraphs][contrictedIndexesInRow[constrictCounter], indexes[1]] = 1;
                             constrictCounter++;
                         }
@@ -172,7 +178,7 @@ namespace PlanarCheck
             Console.Write($"indexes");
             foreach (int[] indexes in Combinations.Make(2, matrix.GetLength(0)))
             {
-                Console.Write($" x{indexes[0]},x{indexes[1]} ");
+                Console.Write($" x{indexes[0] + 1},x{indexes[1] + 1} ");
             }
             Console.WriteLine();
 
@@ -191,6 +197,54 @@ namespace PlanarCheck
                 }
                 Console.WriteLine();
             }
+        }
+
+        public void FindAndDeleteExtraSide(Dictionary<int[], int[,]> table)
+        {
+            int[] extraSide = new int[2];
+            int maxCount = 0;
+
+            foreach (int[] indexes in Combinations.Make(2, matrix.GetLength(0)))
+            {
+                int count = 0;
+                foreach (int[] indexesAsKeys in table.Keys)
+                {
+                    if (table[indexesAsKeys][indexes[0], indexes[1]] == 1)
+                        count++;
+                }
+
+                if (count > maxCount)
+                {
+                    maxCount = count;
+                    extraSide = (int[])indexes.Clone();
+                }
+                else if (count == maxCount)
+                {
+                    if (matrix[indexes[0], indexes[1]] < matrix[extraSide[0], extraSide[1]])
+                    {
+                        extraSide = (int[])indexes.Clone();
+                    }
+
+                }
+            }
+
+            if (maxCount < table.Keys.Count)
+            {
+                List<int[]> otherGraphs = new List<int[]>();
+
+                foreach (int[] indexesAsKeys in table.Keys)
+                {
+                    if (table[indexesAsKeys][extraSide[0], extraSide[1]] == 0)
+                    {
+                        otherGraphs.Add(indexesAsKeys);
+                    }
+                }
+
+                FindAndDeleteExtraSide(MakeMinimalCoverTable(otherGraphs));
+            }
+
+            Console.WriteLine($"удаляем x{extraSide[0] + 1}, x{extraSide[1] + 1}");
+            matrix[extraSide[0], extraSide[1]] = matrix[extraSide[1], extraSide[0]] = 0;
         }
 
         public override string ToString()
