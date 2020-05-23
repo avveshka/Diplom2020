@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+ 
 namespace PlanarCheck
 {
     public class Graph
@@ -68,7 +68,7 @@ namespace PlanarCheck
 
         public bool CheckPlanar(List<int[]> noPlanarGrpahIndexes)
         {
-            return !(CheckOnGomeomorpfGraphAllSubGrphs(4, 5, noPlanarGrpahIndexes) | CheckOnGomeomorpfGraphAllSubGrphs(3, 6, noPlanarGrpahIndexes));
+            return !(CheckOnGomeomorphGraphAllSubGrphs(4, 5, noPlanarGrpahIndexes) | CheckOnGomeomorphGraphAllSubGrphs(3, 6, noPlanarGrpahIndexes));
         }
 
         private bool CheckOnGomeomorpfGraph(int[] indexes, int expectedUnitsInRow, int expectedCountOfRows)
@@ -101,7 +101,7 @@ namespace PlanarCheck
             return false;
         }
 
-        private bool CheckOnGomeomorpfGraphAllSubGrphs(int countUnitsInRow, int coutRows, List<int[]> noPlanarGrpahIndexes)
+        private bool CheckOnGomeomorphGraphAllSubGrphs(int countUnitsInRow, int coutRows, List<int[]> noPlanarGrpahIndexes)
         {
             bool isPlanar = false;
             foreach (int[] indexes in Combinations.Make(coutRows, matrix.GetLength(0)))
